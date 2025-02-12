@@ -1,0 +1,8 @@
+domain: placeholder_yourdomain.com
+user: cluster-admin
+namespace: inference-servers
+notebookName: build-models
+storageSize: 100Gi
+dataConnectionName: inference-models
+enableCUDA: false
+numGPU: "0"

@@ -1,0 +1,8 @@
+clusterSecretStoreName: kubernetes-secrets-store
+
+dataConnection:
+  name: default-connection
+  config:
+    defaultRegion: us-east-2
+    bucketName: test-bucket
+  secretRef: secrets-name

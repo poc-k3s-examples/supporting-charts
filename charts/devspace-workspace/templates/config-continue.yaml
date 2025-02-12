@@ -1,0 +1,99 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: "{{ .Values.config.name }}"
+  labels:
+    controller.devfile.io/mount-to-devworkspace: 'true'
+    controller.devfile.io/watch-configmap: 'true'
+  annotations:
+    controller.devfile.io/mount-as: subpath
+    controller.devfile.io/mount-path: /tmp/.continue-config/
+data:
+  config.json: |
+    {
+      "models": [
+        {
+          "model": "{{ .Values.config.model.name }}",
+          "provider": "openai",
+          "apiKey": "none",
+          "title": "{{ .Values.config.model.name }}",
+          "apiBase": "https://{{ .Values.config.model.name }}-{{ .Values.config.model.project }}.{{ .Values.config.model.domain }}/v1"
+        }
+      ],
+      "tabAutocompleteModel": {
+        "model": "{{ .Values.config.model.name }}",
+        "provider": "openai",
+        "apiKey": "none",
+        "title": "{{ .Values.config.model.name }}",
+        "apiBase": "https://{{ .Values.config.model.name }}-{{ .Values.config.model.project }}.{{ .Values.config.model.domain }}/v1"
+      },
+      "tabAutocompleteOptions": {
+        "useSuffix": true,
+        "maxPromptTokens": 2800,
+        "debounceDelay": 1000,
+        "multilineCompletions": "never",
+        "useCache": true,
+        "useOtherFiles": true,
+        "disable": false,
+        "template": "<|fim_prefix|>{{ `{{{ prefix }}}` }}<|fim_suffix|>{{ `{{{ suffix }}}` }}<|fim_middle|>"
+      },
+      "customCommands": [
+        {
+          "name": "test",
+          "prompt": "{{ `{{{ input }}}` }}\n\nWrite a comprehensive set of unit tests for the selected code. It should setup, run tests that check for correctness including important edge cases, and teardown. Ensure that the tests are complete and sophisticated. Give the tests just as chat output, don't edit any file.",
+          "description": "Write unit tests for highlighted code"
+        }
+      ],
+      "contextProviders": [
+        {
+          "name": "code",
+          "params": {}
+        },
+        {
+          "name": "docs",
+          "params": {}
+        },
+        {
+          "name": "diff",
+          "params": {}
+        },
+        {
+          "name": "terminal",
+          "params": {}
+        },
+        {
+          "name": "problems",
+          "params": {}
+        },
+        {
+          "name": "folder",
+          "params": {}
+        },
+        {
+          "name": "codebase",
+          "params": {}
+        }
+      ],
+      "slashCommands": [
+        {
+          "name": "edit",
+          "description": "Edit selected code"
+        },
+        {
+          "name": "comment",
+          "description": "Write comments for the selected code"
+        },
+        {
+          "name": "share",
+          "description": "Export the current chat session to markdown"
+        },
+        {
+          "name": "cmd",
+          "description": "Generate a shell command"
+        },
+        {
+          "name": "commit",
+          "description": "Generate a git commit message"
+        }
+      ]
+    }

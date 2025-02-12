@@ -1,0 +1,26 @@
+# apiVersion: workspace.devfile.io/v1alpha2
+# kind: DevWorkspace
+# metadata:
+#   name: "{{ .Values.workspace.name }}"
+# spec:
+#   contributions:
+#     - kubernetes:
+#         name: che-code-minimal-vscode-workspace
+#       name: editor
+#   routingClass: che
+#   started: true
+#   template:
+#     attributes:
+#       controller.devfile.io/devworkspace-config:
+#         name: devworkspace-config
+#         namespace: openshift-operators
+#       controller.devfile.io/scc: container-build
+#       controller.devfile.io/storage-type: common
+#       dw.metadata.annotations:
+#         che.eclipse.org/devfile-source: |
+#           url:
+#             location: >-
+#               https://raw.githubusercontent.com/poc-examples/software-templates/refs/heads/main/devfiles/continue-workspace/devfile.yaml
+#           factory:
+#             params: >-
+#               url=https://raw.githubusercontent.com/poc-examples/software-templates/refs/heads/main/devfiles/continue-workspace/devfile.yaml

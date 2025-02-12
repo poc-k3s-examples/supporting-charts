@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Values.name }}-job"
+spec:
+  template:
+    spec:
+      containers:
+      - name: "{{ .Values.name }}-sync-model"
+        image: python:3.9-slim
+        command: ["sh", "-c", "pip install --upgrade pip --user && pip install -r /scripts/requirements.txt --user --no-warn-script-location && python /scripts/sync_model.py"]
+        env:
+          - name: PIP_CACHE_DIR
+            value: ~/.cache/pip
+          - name: MODEL_REVISION
+            value: "{{ .Values.model.revision }}"
+          - name: MODEL_REPOSITORY
+            value: "{{ .Values.model.repository }}"
+        envFrom:
+          - secretRef:
+              name: "{{ .Values.dataConnector }}"
+        volumeMounts:
+          - name: script
+            mountPath: /scripts
+            readOnly: true
+          - name: local-cache
+            mountPath: /.local
+      restartPolicy: Never
+      volumes:
+        - name: script
+          configMap:
+            name: "{{ .Values.name }}-sync-model-script"
+        - name: local-cache
+          emptyDir: {}
+  backoffLimit: 4

@@ -1,0 +1,5 @@
+name: qwen25-code-sync
+dataConnector: aws-credentials-build-models-data-connector
+model:
+  repository: Qwen/Qwen2.5-Coder-7B-Instruct
+  revision: main

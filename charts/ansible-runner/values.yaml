@@ -1,0 +1,73 @@
+scope: Role
+
+runner:
+  name: "default"
+  namespace: "default"
+  image: "quay.io/rh_ee_cengleby/ansible_runner:latest"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+  # envFrom:
+  #   - secretRef:
+  #       name: rosa-token
+  #   - secretRef:
+  #       name: keycloak-client-secret-openshift
+  # env:
+  #   - name: VAULT_TOKEN
+  #     value: placeholder
+
+requirements:
+  # roles: 
+  #   - repo: "https://github.com/poc-examples/gitlab-role.git"
+  #     name: gitlab
+
+  collections:
+    - name: bootstrap.workshop
+      source: https://github.com/poc-examples/ansible-collections.git#/bootstrap/workshop
+      type: git
+      version: main
+      roles:
+        - name: gitlab
+    - name: community.kubernetes
+      source: "https://galaxy.ansible.com"
+    - name: community.okd
+      source: "https://galaxy.ansible.com"
+
+additionalVars:
+  vault:
+    enabled: true
+  gitops:
+    namespace: "openshift-gitops"
+  domain: apps.domain.com
+
+initialJob:
+  enabled: true
+
+cron:
+  enabled: false
+  schedule: "*/30 * * * *"
+
+rules:
+  - apiGroups:
+      - "external-secrets.io"
+    resources: 
+      - "pushsecrets"
+    verbs:
+      - "get"
+      - "list"
+      - "create"
+      - "update"
+  - apiGroups:
+      - ""
+    resources:
+      - "secrets"
+    verbs:
+      - "get" 
+      - "list"
+      - "create"
+  - apiGroups:
+      - "apps"
+    resources:
+      - "deployments"
+    verbs:
+      - "get" 
+      - "list"

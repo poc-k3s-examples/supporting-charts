@@ -1,0 +1,12 @@
+clusterSecretStoreName: kubernetes-secrets-store
+
+serviceName: llama3
+servingRuntime: multi-gpu-vllm-runtime
+replicas: 1
+GPUCount: 2
+dataConnection:
+  name: inference-models
+  modelPath: models/meta-llama/Meta-Llama-3.1-8B-Instruct/
+resources:
+  cpu: "2"
+  mem: 35Gi

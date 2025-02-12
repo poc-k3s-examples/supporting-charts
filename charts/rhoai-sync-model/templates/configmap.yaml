@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ .Values.name }}-sync-model-script"
+data:
+  sync_model.py: |
+    #!/bin/pyton3
+    import os
+    from huggingface_hub import snapshot_download
+    import boto3
+    import glob
+
+    SAVE_DIR = "/tmp/model/"
+    os.environ["HF_HOME"] = SAVE_DIR
+
+    AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
+
+    MODEL_REVISION = os.getenv("MODEL_REVISION")
+    MODEL_REPOSITORY = os.getenv("MODEL_REPOSITORY")
+
+    print(f"Syncing model: {MODEL_REPOSITORY}@{MODEL_REVISION}")
+    snapshot_download(
+        repo_id=MODEL_REPOSITORY,
+        cache_dir=SAVE_DIR,
+        ignore_patterns=["original/*"]
+    )
+
+    s3client = boto3.client('s3')
+    for file_name in glob.glob(f"{SAVE_DIR}/*/snapshots/**/*", recursive=True):
+        if os.path.isfile(file_name):
+            relpath = os.path.relpath(file_name, SAVE_DIR)
+            basename = os.path.basename(relpath)
+            print(f"syncing: models/{relpath}")
+            s3client.upload_file(
+                f"{file_name}",
+                f"{AWS_S3_BUCKET}", 
+                f"models/{MODEL_REPOSITORY}/snapshots/{MODEL_REVISION}/{basename}"
+            )
+    
+    print(f"Model {MODEL_REPOSITORY}@{MODEL_REVISION} Sync'd")
+
+  requirements.txt: |
+    huggingface_hub
+    boto3
